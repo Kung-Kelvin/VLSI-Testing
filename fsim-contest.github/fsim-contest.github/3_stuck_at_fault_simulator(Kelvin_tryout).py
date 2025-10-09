@@ -45,7 +45,7 @@ def logic_gate(gate:str, inputs:list):
         holder =0
         [holder:=holder|x for x in inputs]
         return 1 if holder else 0
-    elif gate=="NOR":
+    elif gate=="NOT":
         return 0 if inputs[0] else 1
     elif gate=="BUFF":
         return 1 if inputs[0] else 0
@@ -90,6 +90,41 @@ def read_bench(file: str):
     log (f"Finished reading bench file: {file}")
     return signal_line,circ_struc,primary_input,primary_output
 
+#circuit code
+def circuit_code(signal_line:dict, circ_struc:list):
+    for a in circ_struc:
+        output_signal=a.split(' = ')[0]
+        gate=a.split(' = ')[1].split('(')[0]
+        input_signal_index=a.split(' = ')[1].split('(')[1][:-1]
+        input_signals=[signal_line[x.strip()] for x in input_signal_index.split(',')]
+        signal_line[output_signal]=logic_gate(gate,input_signals)
+    return signal_line
+
+def truth_table(primary_inputs:list, primary_outputs:list,circ_struc:list):
+    '''
+    Params:
+        primary_inputs(list): A list of the primary input signals index
+        primary_outputs(list): A list of the primary output signals index
+        circ_struct(list): A list with the relationships between inputs and outputs
+    Returns:
+        fault_free_circuit(dict): #key:binary input for primary inputs #value:fault-free output
+    '''
+    b={}
+    fault_free_circuit={}
+    for a in range(2**len(primary_inputs)):
+        aux=0
+        while aux<len(primary_inputs):
+            try:
+                b[primary_inputs[aux]]=int(bin(a)[aux+2])
+            except:
+                b[primary_inputs[aux]]=0
+            aux+=1
+        normal_output=circuit_code(b,circ_struc)
+        bench_outputs=[normal_output[x] for x in primary_outputs]
+        fault_free_circuit['0'*(len(primary_inputs)-(len(bin(a))-2))+bin(a)[2:]]=bench_outputs
+    log("Truth table generated")
+    return fault_free_circuit
+
 def read_test(test_file:str, signal_line:dict, circ_struc:list, primary_input:list,primary_output:list):
     '''
     Args:
@@ -120,12 +155,7 @@ def read_test(test_file:str, signal_line:dict, circ_struc:list, primary_input:li
                 
                 #executing the testing from the bench file (running the circuit)
                 #structure= output signal= logic gate (input signal)
-                for a in circ_struc:
-                    output_signal=a.split(' = ')[0]
-                    gate=a.split(' = ')[1].split('(')[0]
-                    input_signal_index=a.split(' = ')[1].split('(')[1][:-1]
-                    input_signals=[signal_line[x.strip()] for x in input_signal_index.split(',')]
-                    signal_line[output_signal]=logic_gate(gate,input_signals)
+                signal_line=circuit_code(signal_line,circ_struc)
                 circuit_output=[signal_line[x] for x in primary_output]
                 # print(f'Data input: {line[:line.index('-')]}, \tData output: {circuit_output}')
     f.close()
@@ -147,6 +177,9 @@ def main():
     #
     # Add fault simulation code
     #
+    #1. read bench
+    #2. generated truth table
+
     fault_count_total = 1234  # mock result
     fault_count_detected = 1233  # mock result
 
