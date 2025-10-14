@@ -50,21 +50,72 @@ def logic_gate(gate:str, inputs:list):
     elif gate=="BUFF":
         return 1 if inputs[0] else 0
 
-def read_bench(file: str):
+#circuit code
+def circuit_code(signal_line:dict, circ_struc:list):
+    for a in circ_struc:
+        output_signal=a.split(' = ')[0]
+        gate=a.split(' = ')[1].split('(')[0]
+        input_signal_index=a.split(' = ')[1].split('(')[1][:-1]
+        input_signals=[signal_line[x.strip()] for x in input_signal_index.split(',')]
+        signal_line[output_signal]=logic_gate(gate,input_signals)
+    return signal_line
+
+def truth_table(primary_inputs:list, primary_outputs:list,circ_struc:list):
     '''
-    :param str file: it should be the path of the file to read (.bench)
-    
-    :return dict signal_line: #keys is the signal number #value is the signal logic value
-    :return list circ_struc: this contains the interconnection information between the logic gates
-    :return list primary_input: a list of the primary input indexes of the circuit
-    :return list priamry_output: a list of the primary output indexes of the circuit
+    Params:
+        primary_inputs(list): A list of the primary input signals index
+        primary_outputs(list): A list of the primary output signals index
+        circ_struct(list): A list with the relationships between inputs and outputs
+    Returns:
+        fault_free_circuit(dict): key:binary input for primary inputs value:fault-free output
     '''
+    log("Beginning truth table generation")
+    b={}
+    fault_free_circuit={}
+    print(primary_inputs)
+    for a in range(2**len(primary_inputs)):
+        aux=0
+        c=bin(a)[2:].zfill(len(primary_inputs))
+        while aux<len(primary_inputs):
+            b[primary_inputs[aux]]=int(c[aux])
+            aux+=1
+        normal_output=circuit_code(b,circ_struc)
+        bench_outputs=[normal_output[x] for x in primary_outputs]
+        print(bin(a)[2:].zfill(3),bench_outputs)
+        fault_free_circuit['0'*(len(primary_inputs)-(len(bin(a))-2))+bin(a)[2:]]=bench_outputs
+    log("Finished generating truth table")
+    return fault_free_circuit
+
+#reading the bench file to assign the input, output and intermediate connections.
+#read only once (the rutine is the same for ALL the data)
+def read_bench(bench_file:str):
+    """_summary_
+
+    Args
+    -------
+        bench_file : str
+            the path of the bench file to evaluate
+
+    Returns
+    -------
+        signal_logic_value : dict
+            logic value for each of the signal
+
+        circ_struct: list
+            relationship input, gate and output
+
+        signal_hierarchy: dict
+            signals map of the circuit
+        
+        truth table: dict
+            ONLY if the circuit has 8 or less inputs, the truth table is generated
+    """      
     aux=0
-    signal_line={} #key:singal line value: logic value (0/1)
-    primary_input=[]
-    primary_output=[]
+    signal_logic_value={} #key:singal line value: logic value (0/1)
     circ_struc=[] #circuit structure
-    with open(file) as f:
+    signal_hierarchy={} #key: level #value[list]: list of inputs. All signals are considered input
+    signal_hierarchy[0]=[]
+    with open(bench_file) as f:
         while True:
             a=f.readline().strip()
             if aux>3:
@@ -77,28 +128,38 @@ def read_bench(file: str):
                     continue
                 else:
                     if 'INPUT' in a or 'OUTPUT' in a: #connections for primary input and primary output
-                        b=''.join(filter(str.isnumeric,a))
-                        signal_line[b]=''
+                        # b=''.join(filter(str.isnumeric,a))
+                        b=a.split('(')[1][:-1]
+                        signal_logic_value[b]=''
                         if 'INPUT' in a:
-                            primary_input.append(b)
-                        else:
-                            primary_output.append(b)
+                            signal_hierarchy[0].append(b)
                     else: # signal = gate (input signal)
-                        signal_line[a.split(' = ')[0]]=''
+                        signal_logic_value[a.split(' = ')[0]]=''
                         circ_struc.append(a)
+                        y='0'
+                        for z in a.split(' = ')[1].split('(')[1][:-1].split(', '):
+                            y=max(y,z)
+                        ind=0
+                        #evaluates in string format
+                        while ind<len(signal_hierarchy):
+                            if y not in signal_hierarchy[ind]:
+                                ind+=1
+                            else:
+                                break
+                        ind+=1
+                        if ind not in signal_hierarchy:
+                            signal_hierarchy[ind]=[]
+                        signal_hierarchy[ind].append(a.split(' = ')[0])
     f.close()
-    log (f"Finished reading bench file: {file}")
-    return signal_line,circ_struc,primary_input,primary_output
+    log (f"Finished reading bench file: {bench_file}")
+    if len(signal_hierarchy[0])<8: #it was chosen 8, in order to use an 8 switch input from wokwi
+        log(f'circuit is small enough to perform a functional testing, generating truth table')
+        truth=truth_table(signal_hierarchy[0],signal_hierarchy[len(signal_hierarchy)-1],circ_struc)
+        return signal_logic_value, circ_struc, signal_hierarchy,truth
+    else:
+        log(f'circuit has over 10  inputs, too large to perfom a functional testing')
+        return signal_logic_value, circ_struc, signal_hierarchy 
 
-#circuit code
-def circuit_code(signal_line:dict, circ_struc:list):
-    for a in circ_struc:
-        output_signal=a.split(' = ')[0]
-        gate=a.split(' = ')[1].split('(')[0]
-        input_signal_index=a.split(' = ')[1].split('(')[1][:-1]
-        input_signals=[signal_line[x.strip()] for x in input_signal_index.split(',')]
-        signal_line[output_signal]=logic_gate(gate,input_signals)
-    return signal_line
 
 def truth_table(primary_inputs:list, primary_outputs:list,circ_struc:list):
     '''
