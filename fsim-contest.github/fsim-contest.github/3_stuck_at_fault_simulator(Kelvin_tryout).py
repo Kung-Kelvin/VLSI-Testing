@@ -168,22 +168,22 @@ def truth_table(primary_inputs:list, primary_outputs:list,circ_struc:list):
         primary_outputs(list): A list of the primary output signals index
         circ_struct(list): A list with the relationships between inputs and outputs
     Returns:
-        fault_free_circuit(dict): #key:binary input for primary inputs #value:fault-free output
+        fault_free_circuit(dict): key:binary input for primary inputs value:fault-free output
     '''
+    log("Beginning truth table generation")
     b={}
-    fault_free_circuit={}
+    fault_free_circuit=[]
     for a in range(2**len(primary_inputs)):
         aux=0
+        c=bin(a)[2:].zfill(len(primary_inputs))
         while aux<len(primary_inputs):
-            try:
-                b[primary_inputs[aux]]=int(bin(a)[aux+2])
-            except:
-                b[primary_inputs[aux]]=0
+            b[primary_inputs[aux]]=int(c[aux])
             aux+=1
         normal_output=circuit_code(b,circ_struc)
         bench_outputs=[normal_output[x] for x in primary_outputs]
-        fault_free_circuit['0'*(len(primary_inputs)-(len(bin(a))-2))+bin(a)[2:]]=bench_outputs
-    log("Truth table generated")
+        # print(bin(a)[2:].zfill(3),bench_outputs)
+        fault_free_circuit.append(bench_outputs)
+    log("Finished generating truth table")
     return fault_free_circuit
 
 def read_test(test_file:str, signal_line:dict, circ_struc:list, primary_input:list,primary_output:list):
