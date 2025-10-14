@@ -86,4 +86,9 @@ two functions have been coded in [program](./fsim-contest.github/fsim-contest.gi
 **pending**
 - run stuck-at faults model
 - compare output between "correct" and stuck-at fault model
-## Stuck-at-fautl model
+## Stuck-at-fault model
+
+Making a truth table for doing functional testing proved fruitless. When trying to run the truth table for [C6288](./fsim-contest.github/fsim-contest.github/data.nogit/c6288.bench) the VM colapsed after 71 min and only performed 0.0039% of the needed outputs.
+
+### Fault colapsing
+This approach was recommended by prof. Stefan in order to reduce the amount of required operations. In [file](./fsim-contest.github/fsim-contest.github/fault%20colapsing) all the brute force fault collapsing for all the logic gates was performed.
