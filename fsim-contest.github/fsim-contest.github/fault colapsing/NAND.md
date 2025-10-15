@@ -1,4 +1,4 @@
-|Logic Gate|primary input|SA type|stuck-at fault input|primary output|stuck-at output|failed?|
+|Logic Gate|primary input <br> AB|SA type |stuck-at fault input <br> AB|primary output|stuck-at output|failed?|
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: 
 |NAND|00|SA0[A]|00|1|1||
 |NAND|01|SA0[A]|01|1|1||
