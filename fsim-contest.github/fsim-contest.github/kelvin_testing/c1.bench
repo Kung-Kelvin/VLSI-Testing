@@ -1,0 +1,18 @@
+# c1
+# 3 inputs
+# 1 outputs
+# 0 inverter
+# 4 gates ( 1 NOTs +2 ANDs + 1 ORs)
+
+INPUT(a)
+INPUT(b)
+INPUT(c)
+
+OUTPUT(y)
+
+d = BUFF(b)
+e = BUFF(b)
+f = NOT(e)
+h = AND(f, c)
+g = AND(a, d)
+y = OR(g, h)
