@@ -86,3 +86,36 @@ two functions have been coded in [program](./fsim-contest.github/fsim-contest.gi
 **pending**
 - run stuck-at faults model
 - compare output between "correct" and stuck-at fault model
+
+
+## master prompt for python code generation
+```
+You are an expert Python developer and VLSI testing simulation architect. We are designing a lightweight research prototype to evaluate a custom, criticality-weighted testing and ATPG approach using the ISCAS c880 ALU benchmark circuit.
+
+Your goal is to help me design and write modular Python scripts for the following workflow:
+1. Circuit Representation: Parse or structurally model the c880 netlist (using NetworkX or a custom gate-level structure).
+2. Golden Functional Simulation: Run baseline functional simulations of the ALU to establish the correct expected Primary Output (PO) behavior.
+3. Fault Injection & Weighting Framework: Implement a mechanism to inject single stuck-at faults (SAF), propagate them, and compute a fault weight based on:
+   - Approach 1: Random Vector baseline ATPG.
+   - Approach 2.1: Weighted approach with uniform PO weights.
+   - Approach 2.2: Custom PO weights and ECC-aware metrics (where uncorrectable/high-deviation errors are heavily prioritized).
+4. Resource Profiling: Track computational metrics during generation and application phases—specifically measuring CPU time, peak RAM usage, and vector generation efficiency (using libraries like `tracemalloc` or `time`).
+
+Let's build this step-by-step. Start by outlining the project architecture and writing a clean script to parse/model the c880 netlist and run the golden simulation baseline.
+```
+
+## master prompt for research 
+```
+You are an expert academic researcher in VLSI testing, design-for-testability (DFT), and functional safety (e.g., ISO 26262 compliance). 
+
+I am investigating a research hypothesis and need you to search for academic papers, industrial whitepapers (such as Siemens Tessent's Total Critical Area / TCA-weighted ATPG), or IEEE publications that objectively evaluate or discuss the following approach:
+- Combining structural fault models (like stuck-at faults) with functional criticality and Error Correction Code (ECC) masking awareness.
+- Assigning specific weights to Primary Outputs (POs) and internal circuit faults to represent the severity of error deviation from a golden scenario.
+- Guiding or prioritizing ATPG test generation and vector selection based on these custom fault/PO criticality weights rather than treating all faults or outputs equally.
+
+Please provide:
+1. Specific academic keywords or sub-fields where this research resides (e.g., risk-based ATPG, defect-oriented testing, application-aware test optimization).
+2. Real-world precedents or commercial equivalents (e.g., Critical Area-based ATPG).
+3. Key theoretical pros and cons (e.g., how prioritizing high-weight faults affects test pattern compaction versus missing random "low-weight" structural defects).
+4. Suggestions for standard metrics used in literature to prove or disprove the efficacy of such a weighted approach over standard random or uniform ATPG.
+```
