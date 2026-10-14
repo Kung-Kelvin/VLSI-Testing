@@ -25,7 +25,7 @@ C in|Carry in|261|
 C8|Carry out|866
 
 ## Simulations results
-
+$$fsim performance = \frac{gates *faults *patters}{seconds}$$
 ### Case 1 (fsim baseline)
 ```
 # 0000000.589 W Cuda unavailable. Falling back to pure Python.
@@ -47,3 +47,45 @@ C8|Carry out|866
 ```
 
 ### Case 2 (All POs weight = 1)
+**only entered 140 vectors**
+```
+# 0000000.316 W Cuda unavailable. Falling back to pure Python.
+# 0000002.453 - loading ../../fsim-contest.github/fsim-contest.github/data.nogit/c880.bench ...
+# 0000002.476 - circuit stats={'node': 826, 'cell': 383, 'fork': 443, 'io': 86, 'line': 1112, 'comb': 383, 'dff': 0, 'latch': 0, 'seq': 0}
+# 0000002.479 - line role stats={'lout': 1112}
+# 0000002.492 - fault sites: 834
+# 0000002.492 - uncollapsed stuck-at fault count: 1668
+# 0000002.492 - collapsed stuck-at fault count: 850
+# 0000002.494 - FFR count: 151
+# 0000002.495 - FFR set stats:
+# 0000002.495 - [part] [size] [reach] [prop avg.]
+# 0000002.495 - [all]    151     151    0.104
+# 0000002.495 - [  0]    151     151    0.104
+# 0000002.495 - loading ../../fsim-contest.github/fsim-contest.github/data.nogit/c880.tests ...
+# 0000002.515 - simple safsim.sim={name: "../../fsim-contest.github/fsim-contest.github/data.nogit/c880.bench", sims: 140, c_bytes: 21e3}
+# 0000024.033 - safsim.timers={startup: 20.98, sim: 0.54, sim_eval2: 0.10}
+# 0000024.033 - fsim performance: 8.43e+07 gfp/s
+# 0000024.033 - detected by simulation (collapsed): 818/850  -  96.24%
+```
+
+### Case 3 (Customs POs)
+**only entered 62 vectors**
+```
+# 0000000.330 W Cuda unavailable. Falling back to pure Python.
+# 0000002.396 - loading ../../fsim-contest.github/fsim-contest.github/data.nogit/c880.bench ...
+# 0000002.420 - circuit stats={'node': 826, 'cell': 383, 'fork': 443, 'io': 86, 'line': 1112, 'comb': 383, 'dff': 0, 'latch': 0, 'seq': 0}
+# 0000002.422 - line role stats={'lout': 1112}
+# 0000002.435 - fault sites: 834
+# 0000002.435 - uncollapsed stuck-at fault count: 1668
+# 0000002.435 - collapsed stuck-at fault count: 850
+# 0000002.437 - FFR count: 151
+# 0000002.438 - FFR set stats:
+# 0000002.438 - [part] [size] [reach] [prop avg.]
+# 0000002.438 - [all]    151     151    0.104
+# 0000002.438 - [  0]    151     151    0.104
+# 0000002.439 - loading ../../fsim-contest.github/fsim-contest.github/data.nogit/c880.tests ...
+# 0000002.460 - simple safsim.sim={name: "../../fsim-contest.github/fsim-contest.github/data.nogit/c880.bench", sims: 62, c_bytes: 9e3}
+# 0000023.952 - safsim.timers={startup: 21.06, sim: 0.43, sim_eval2: 0.07}
+# 0000023.952 - fsim performance: 4.67e+07 gfp/s
+# 0000023.952 - detected by simulation (collapsed): 796/850  -  93.65%
+```
